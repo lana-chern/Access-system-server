@@ -44,8 +44,8 @@ $$
         quantity_of_person int;
         quantity_of_room   int;
     BEGIN
-        quantity_of_person = 5;
-        quantity_of_room = 10000;
+        quantity_of_person = 10000;
+        quantity_of_room = 5;
 
         FOR i IN 1..quantity_of_person
             LOOP
