@@ -1,10 +1,11 @@
-package com.example.access_system_server.dao;
+package com.piano.access_system_server.dao;
 
-import com.example.access_system_server.entity.Person;
-import com.example.access_system_server.entity.PersonRoom;
-import com.example.access_system_server.entity.Room;
-import com.example.access_system_server.service.connection.ConnectorDB;
+import com.piano.access_system_server.entity.Person;
+import com.piano.access_system_server.entity.PersonRoom;
+import com.piano.access_system_server.entity.Room;
+import com.piano.access_system_server.service.connection.ConnectorDB;
 
+import javax.naming.NamingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,29 +22,26 @@ import java.util.List;
  */
 public class PersonRoomDAO implements DAO<Long, PersonRoom> {
     public static final String SQL_SELECT_ALL_PERSON_ROOM = "SELECT * FROM person_room";
-    public static final String SQL_SELECT_PERSON_ROOM_BY_PERSON_ROOM_ENTRANCE = "SELECT * FROM person_room WHERE person_id = ?" +
+    public static final String SQL_SELECT_PERSON_ROOM_BY_PERSON_AND_ROOM = "SELECT * FROM person_room WHERE person_id = ?" +
             "AND room_id = ? ORDER BY id DESC LIMIT 1";
     public static final String SQL_CREATE_PERSON_ROOM = "INSERT INTO person_room(person_id, room_id, entrance, create_date) " +
             "VALUES(?,?,?,?)";
 
     @Override
-    public List<PersonRoom> findAll() {
-        List<PersonRoom> personRoomList = new ArrayList<>();
+    public List<PersonRoom> findAll() throws SQLException, NamingException {
         try (Connection connection = ConnectorDB.getConnection();
              Statement statement = connection.createStatement()) {
             ResultSet rs = statement.executeQuery(SQL_SELECT_ALL_PERSON_ROOM);
+            List<PersonRoom> personRoomList = new ArrayList<>();
             while (rs.next()) {
-                long id = rs.getLong(1);
                 long personId = rs.getLong(2);
                 long roomId = rs.getLong(3);
                 boolean entrance = rs.getBoolean(4);
                 LocalDateTime createDate = rs.getTimestamp(5).toLocalDateTime();
-                personRoomList.add(new PersonRoom(id, new Person(personId), new Room(roomId), entrance, createDate));
+                personRoomList.add(new PersonRoom(new Person(personId), new Room(roomId), entrance, createDate));
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            return personRoomList;
         }
-        return personRoomList;
     }
 
     @Override
@@ -51,23 +49,20 @@ public class PersonRoomDAO implements DAO<Long, PersonRoom> {
         throw new UnsupportedOperationException();
     }
 
-    public PersonRoom findLastEntityByPersonRoom(Person person, Room room) {
-        PersonRoom personRoom = null;
+    public PersonRoom findLastEntityByPersonRoom(Person person, Room room) throws SQLException, NamingException {
         try (Connection connection = ConnectorDB.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SQL_SELECT_PERSON_ROOM_BY_PERSON_ROOM_ENTRANCE)) {
+             PreparedStatement statement = connection.prepareStatement(SQL_SELECT_PERSON_ROOM_BY_PERSON_AND_ROOM)) {
             statement.setLong(1, person.getId());
             statement.setLong(2, room.getId());
             ResultSet rs = statement.executeQuery();
+            PersonRoom personRoom = null;
             while (rs.next()) {
-                long id = rs.getLong(1);
                 boolean entrance = rs.getBoolean(4);
                 LocalDateTime createDate = rs.getTimestamp(5).toLocalDateTime();
-                personRoom = new PersonRoom(id, person, room, entrance, createDate);
+                personRoom = new PersonRoom(person, room, entrance, createDate);
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            return personRoom;
         }
-        return personRoom;
     }
 
     @Override
@@ -81,7 +76,7 @@ public class PersonRoomDAO implements DAO<Long, PersonRoom> {
     }
 
     @Override
-    public void create(PersonRoom entity) {
+    public void create(PersonRoom entity) throws SQLException, NamingException {
         try (Connection connection = ConnectorDB.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQL_CREATE_PERSON_ROOM)) {
             statement.setLong(1, entity.getPerson().getId());
@@ -89,8 +84,6 @@ public class PersonRoomDAO implements DAO<Long, PersonRoom> {
             statement.setBoolean(3, entity.isEntrance());
             statement.setTimestamp(4, Timestamp.valueOf(entity.getCreateDate()));
             statement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
     }
 }

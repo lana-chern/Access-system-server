@@ -1,10 +1,12 @@
-package com.example.access_system_server.service;
+package com.piano.access_system_server.service;
 
-import com.example.access_system_server.dao.PersonRoomDAO;
-import com.example.access_system_server.entity.Person;
-import com.example.access_system_server.entity.PersonRoom;
-import com.example.access_system_server.entity.Room;
+import com.piano.access_system_server.dao.PersonRoomDAO;
+import com.piano.access_system_server.entity.Person;
+import com.piano.access_system_server.entity.PersonRoom;
+import com.piano.access_system_server.entity.Room;
 
+import javax.naming.NamingException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 /**
@@ -18,11 +20,11 @@ public class PersonRoomService {
         this.personRoomDAO = new PersonRoomDAO();
     }
 
-    public void create(PersonRoom personRoom) {
+    public void create(PersonRoom personRoom) throws SQLException, NamingException {
         personRoomDAO.create(personRoom);
     }
 
-    public boolean isPersonAllowedToMove(PersonRoom personRoom) {
+    public boolean isPersonAllowedToMove(PersonRoom personRoom) throws SQLException, NamingException {
         if (personRoom.isEntrance()) {
             return isPersonAllowedToEnterRoom(personRoom.getPerson(), personRoom.getRoom());
         } else {
@@ -30,7 +32,7 @@ public class PersonRoomService {
         }
     }
 
-    public boolean isPersonAllowedToEnterRoom(Person person, Room room) {
+    private boolean isPersonAllowedToEnterRoom(Person person, Room room) throws SQLException, NamingException {
         PersonRoom lastPersonRoom = personRoomDAO.findLastEntityByPersonRoom(person, room);
         if (lastPersonRoom == null || !lastPersonRoom.isEntrance()) {
             create(new PersonRoom(person, room, true, LocalDateTime.now()));
@@ -39,7 +41,7 @@ public class PersonRoomService {
         return false;
     }
 
-    public boolean isPersonAllowedToLeaveRoom(Person person, Room room) {
+    private boolean isPersonAllowedToLeaveRoom(Person person, Room room) throws SQLException, NamingException {
         PersonRoom lastPersonRoom = personRoomDAO.findLastEntityByPersonRoom(person, room);
         if (lastPersonRoom != null && lastPersonRoom.isEntrance()) {
             create(new PersonRoom(person, room, false, LocalDateTime.now()));

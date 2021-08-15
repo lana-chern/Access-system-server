@@ -1,8 +1,9 @@
-package com.example.access_system_server.dao;
+package com.piano.access_system_server.dao;
 
-import com.example.access_system_server.entity.Room;
-import com.example.access_system_server.service.connection.ConnectorDB;
+import com.piano.access_system_server.entity.Room;
+import com.piano.access_system_server.service.connection.ConnectorDB;
 
+import javax.naming.NamingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,36 +21,32 @@ public class RoomDAO implements DAO<Long, Room> {
     public static final String SQL_SELECT_ROOM_BY_ID = "SELECT * FROM room WHERE id=?";
 
     @Override
-    public List<Room> findAll() {
-        List<Room> roomList = new ArrayList<>();
+    public List<Room> findAll() throws SQLException, NamingException {
         try (Connection connection = ConnectorDB.getConnection();
              Statement statement = connection.createStatement()) {
             ResultSet rs = statement.executeQuery(SQL_SELECT_ALL_ROOM);
+            List<Room> roomList = new ArrayList<>();
             while (rs.next()) {
                 long id = rs.getLong(1);
                 roomList.add(new Room(id));
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            return roomList;
         }
-        return roomList;
     }
 
     @Override
-    public Room findEntityById(Long id) {
-        Room room = null;
+    public Room findEntityById(Long id) throws SQLException, NamingException {
         try (Connection connection = ConnectorDB.getConnection();
              PreparedStatement statement =
                      connection.prepareStatement(SQL_SELECT_ROOM_BY_ID)) {
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
+            Room room = null;
             if (rs.next()) {
                 room = new Room(id);
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            return room;
         }
-        return room;
     }
 
     @Override

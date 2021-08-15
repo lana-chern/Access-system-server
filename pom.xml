@@ -4,13 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.example</groupId>
+    <groupId>com.piano</groupId>
     <artifactId>access-system-server</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>Access system server</name>
     <packaging>war</packaging>
 
     <properties>
+        <context.db.path>${env.ACCESS_SYSTEM_DB_PATH}</context.db.path>
+        <context.db.user>${env.ACCESS_SYSTEM_DB_USER}</context.db.user>
+        <context.db.password>${env.ACCESS_SYSTEM_DB_PASSWORD}</context.db.password>
+
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <postgres.version>42.2.2.jre7</postgres.version>
@@ -35,6 +39,15 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.1</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/webapp/META-INF</directory>
+                            <filtering>true</filtering>
+                            <targetPath>/META-INF</targetPath>
+                        </resource>
+                    </webResources>
+                </configuration>
             </plugin>
         </plugins>
     </build>
