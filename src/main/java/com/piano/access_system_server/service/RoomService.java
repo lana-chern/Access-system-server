@@ -17,12 +17,7 @@ public class RoomService {
         this.roomDAO = new RoomDAO();
     }
 
-    public boolean checkIfRoomExists(Room room) {
-        try {
+    public boolean checkIfRoomExists(Room room) throws SQLException, NamingException {
             return roomDAO.findEntityById(room.getId()) != null;
-        } catch (SQLException | NamingException throwables) {
-            throwables.printStackTrace();
-        }
-        return false;
     }
 }

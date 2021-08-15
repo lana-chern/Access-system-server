@@ -49,7 +49,7 @@ public class PersonRoomDAO implements DAO<Long, PersonRoom> {
         throw new UnsupportedOperationException();
     }
 
-    public PersonRoom findLastEntityByPersonRoom(Person person, Room room) throws SQLException, NamingException {
+    public PersonRoom findLastEntityByPersonAndRoom(Person person, Room room) throws SQLException, NamingException {
         try (Connection connection = ConnectorDB.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQL_SELECT_PERSON_ROOM_BY_PERSON_AND_ROOM)) {
             statement.setLong(1, person.getId());

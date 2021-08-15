@@ -34,4 +34,20 @@ public class PersonRoom {
     public LocalDateTime getCreateDate() {
         return createDate;
     }
+
+    @Override
+    public String toString() {
+        return person + " are trying to " +
+                (entrance ? "enter " : "leave ") +
+                room +
+                " at " + createDate;
+    }
+
+    public String accessResultToString(boolean isAllowed) {
+        return person +
+                (isAllowed ? " is allowed" : " is denied") + " to " +
+                (entrance ? "enter " : "leave ") +
+                room +
+                " at " + createDate;
+    }
 }

@@ -17,12 +17,7 @@ public class PersonService {
         this.personDAO = new PersonDAO();
     }
 
-    public boolean checkIfPersonExists(Person person) {
-        try {
+    public boolean checkIfPersonExists(Person person) throws SQLException, NamingException {
             return personDAO.findEntityById(person.getId()) != null;
-        } catch (SQLException | NamingException throwables) {
-            throwables.printStackTrace();
-        }
-        return false;
     }
 }

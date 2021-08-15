@@ -14,4 +14,11 @@ public class Room {
     public long getId() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "id=" + id +
+                '}';
+    }
 }
