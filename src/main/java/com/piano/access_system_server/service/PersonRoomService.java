@@ -33,19 +33,25 @@ public class PersonRoomService {
     }
 
     private boolean isPersonAllowedToEnterRoom(Person person, Room room) throws SQLException, NamingException {
-        PersonRoom lastPersonRoom = personRoomDAO.findLastEntityByPersonAndRoom(person, room);
-        if (lastPersonRoom == null || !lastPersonRoom.isEntrance()) {
+        PersonRoom lastPersonRoom = personRoomDAO.findLastEntityByPerson(person);
+        if (lastPersonRoom != null && lastPersonRoom.isEntrance()) {
+            return false;
+        }
+        if (isIdDivisibleByRoomId(person, room)) {
             create(new PersonRoom(person, room, true, LocalDateTime.now()));
-            return isIdDivisibleByRoomId(person, room);
+            return true;
         }
         return false;
     }
 
     private boolean isPersonAllowedToLeaveRoom(Person person, Room room) throws SQLException, NamingException {
-        PersonRoom lastPersonRoom = personRoomDAO.findLastEntityByPersonAndRoom(person, room);
-        if (lastPersonRoom != null && lastPersonRoom.isEntrance()) {
+        PersonRoom lastPersonRoom = personRoomDAO.findLastEntityByPerson(person);
+        if (lastPersonRoom == null || !lastPersonRoom.isEntrance()) {
+            return false;
+        }
+        if (isTheSameRoomToOut(lastPersonRoom, room)) {
             create(new PersonRoom(person, room, false, LocalDateTime.now()));
-            return isTheSameRoomToOut(lastPersonRoom, room);
+            return true;
         }
         return false;
     }

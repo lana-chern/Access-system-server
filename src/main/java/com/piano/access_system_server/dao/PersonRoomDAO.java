@@ -22,8 +22,8 @@ import java.util.List;
  */
 public class PersonRoomDAO implements DAO<Long, PersonRoom> {
     public static final String SQL_SELECT_ALL_PERSON_ROOM = "SELECT * FROM person_room";
-    public static final String SQL_SELECT_PERSON_ROOM_BY_PERSON_AND_ROOM = "SELECT * FROM person_room WHERE person_id = ?" +
-            "AND room_id = ? ORDER BY id DESC LIMIT 1";
+    public static final String SQL_SELECT_PERSON_ROOM_BY_PERSON = "SELECT * FROM person_room WHERE person_id = ?" +
+            "ORDER BY id DESC LIMIT 1";
     public static final String SQL_CREATE_PERSON_ROOM = "INSERT INTO person_room(person_id, room_id, entrance, create_date) " +
             "VALUES(?,?,?,?)";
 
@@ -49,17 +49,17 @@ public class PersonRoomDAO implements DAO<Long, PersonRoom> {
         throw new UnsupportedOperationException();
     }
 
-    public PersonRoom findLastEntityByPersonAndRoom(Person person, Room room) throws SQLException, NamingException {
+    public PersonRoom findLastEntityByPerson(Person person) throws SQLException, NamingException {
         try (Connection connection = ConnectorDB.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SQL_SELECT_PERSON_ROOM_BY_PERSON_AND_ROOM)) {
+             PreparedStatement statement = connection.prepareStatement(SQL_SELECT_PERSON_ROOM_BY_PERSON)) {
             statement.setLong(1, person.getId());
-            statement.setLong(2, room.getId());
             ResultSet rs = statement.executeQuery();
             PersonRoom personRoom = null;
             while (rs.next()) {
+                long roomId = rs.getLong(3);
                 boolean entrance = rs.getBoolean(4);
                 LocalDateTime createDate = rs.getTimestamp(5).toLocalDateTime();
-                personRoom = new PersonRoom(person, room, entrance, createDate);
+                personRoom = new PersonRoom(new Person(person.getId()), new Room(roomId), entrance, createDate);
             }
             return personRoom;
         }
